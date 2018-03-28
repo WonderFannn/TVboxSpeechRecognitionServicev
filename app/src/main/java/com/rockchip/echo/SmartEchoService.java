@@ -52,7 +52,7 @@ public class SmartEchoService extends Service {
                     mSmartEcho.startTtsOutput("灵犀灵犀来了", false);
                 }
             } else if(SMART_ECHO_ACTION_WAKEUP.equals(action)) {
-                mSmartEcho.onWakeUp(0, 0);
+//                mSmartEcho.onWakeUp(0, 0);
             }
         }
         return START_STICKY;

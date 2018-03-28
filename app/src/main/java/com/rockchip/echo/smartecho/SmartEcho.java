@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -17,14 +16,8 @@ import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechRecognizer;
 import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
-import com.iflytek.cloud.TextUnderstander;
-import com.iflytek.cloud.TextUnderstanderListener;
-import com.iflytek.cloud.UnderstanderResult;
 import com.rockchip.echo.R;
 import com.rockchip.echo.SmartEchoApp;
-import com.rockchip.echo.led.LedController;
-import com.rockchip.echo.smartecho.audio.PcmRecorder;
-import com.rockchip.echo.smartecho.textunderstand.TextUnderstandResult;
 import com.rockchip.echo.util.JsonParser;
 import com.rockchip.echo.util.LogUtil;
 
@@ -33,18 +26,14 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by yhc on 16-11-20.
  */
 
-public class SmartEcho implements CaeWakeupListener {
+public class SmartEcho {
 
     private Context mContext;
-
-    private CaeWakeUpFileObserver mCaeWakeUpFileObserver;
 
     boolean mStartRecognize = false;
     boolean mIsOnTts = false;
@@ -59,32 +48,15 @@ public class SmartEcho implements CaeWakeupListener {
         LogUtil.d("SmartEcho - init");
         initTts();
         initIat();
-        initTextUnderstand();
-        mCaeWakeUpFileObserver = new CaeWakeUpFileObserver(this);
     }
 
     public void start() {
         LogUtil.d("SmartEcho - start");
-        if (mCaeWakeUpFileObserver != null) {
-            mCaeWakeUpFileObserver.startWatching();
-        }
     }
 
     public void stop() {
         LogUtil.d("SmartEcho - stop");
-        if (mCaeWakeUpFileObserver != null) {
-            mCaeWakeUpFileObserver.stopWatching();
-        }
         stopIat();
-    }
-
-    @Override
-    public void onWakeUp(int angle, int chanel) {
-        LogUtil.d("SmartEcho - onWakeUp");
-
-        Log.d("TAG", "Echo  onWakeUp - angle:"+angle+"chane:"+chanel);
-        startTtsOutput(getEchoText(), true);
-        LedController.flashAllLed();
     }
 
     private int mEchoIndex = 0;
@@ -262,30 +234,6 @@ public class SmartEcho implements CaeWakeupListener {
         mTts.setParameter(SpeechConstant.TTS_AUDIO_PATH, Environment.getExternalStorageDirectory()+"/msc/tts.wav");
     }
 
-    /**
-     * ==================================================================================
-     *                               pcm record
-     * ==================================================================================
-     */
-    PcmRecorder mRecorder;
-
-    PcmRecorder.PcmListener mPcmListener = new PcmRecorder.PcmListener() {
-
-        @Override
-        public void onPcmRate(long bytePerMs) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void onPcmData(byte[] data, int dataLen) {
-//			write2File(data);
-            if (mStartRecognize && !mIsOnTts) {
-                // 写入16K采样率音频，开始听写
-                mIat.writeAudio(data, 0, dataLen);
-            }
-        }
-    };
 
     /**
      * ==================================================================================
@@ -296,8 +244,6 @@ public class SmartEcho implements CaeWakeupListener {
 
     private void initIat() {
         LogUtil.d("SmartEcho - initIat");
-        mRecorder = new PcmRecorder();
-        mRecorder.startRecording(mPcmListener);
 
         mIat = SpeechRecognizer.createRecognizer(mContext, null);
         setIatParam();
@@ -353,7 +299,6 @@ public class SmartEcho implements CaeWakeupListener {
         if(mIat != null && !mIat.isListening()) {
             mIat.startListening(mIatListener);
         }
-        showLedOnListener(true);
     }
 
     private void stopIat() {
@@ -362,7 +307,6 @@ public class SmartEcho implements CaeWakeupListener {
         if(mIat != null && mIat.isListening()) {
             mIat.stopListening();
         }
-        showLedOnListener(false);
     }
 
     private void setIatParam() {
@@ -427,147 +371,8 @@ public class SmartEcho implements CaeWakeupListener {
         }
         Toast.makeText(SmartEchoApp.getContext(),text,Toast.LENGTH_SHORT).show();
         Log.d("TAG", "printResult: "+text);
-        int ret = mTextUnderstander.understandText(text, mTextUnderstanderListener);
-        if(ret != 0)
-        {
-            LogUtil.d("text understand error: "+ ret);
-        }
+
     }
 
-
-    /**
-     * ==================================================================================
-     *                               text understand
-     * ==================================================================================
-     */
-    // 语义理解对象（文本到语义）
-    private TextUnderstander mTextUnderstander;
-
-    /**
-     * 初始化监听器（文本到语义）。
-     */
-    private InitListener mTextUdrInitListener = new InitListener() {
-
-        @Override
-        public void onInit(int code) {
-            LogUtil.d("textUnderstanderListener init() code = " + code);
-            if (code != ErrorCode.SUCCESS) {
-                LogUtil.d("====== mTextUdrInitListener - onInit - init error, code: " + code);
-            }
-        }
-    };
-
-    private TextUnderstanderListener mTextUnderstanderListener = new TextUnderstanderListener() {
-
-        @Override
-        public void onResult(final UnderstanderResult result) {
-            LogUtil.d("========= TextUnderstanderListener - onResult =========");
-            if (null != result) {
-                // 显示
-                String UnderstandText = result.getResultString();
-                if (!TextUtils.isEmpty(UnderstandText)) {
-//					String showtext = mResultEdit.getText().toString();
-//					showtext += "\r\n";
-//					showtext += UnderstandText;
-//					mResultEdit.setText(showtext);
-                    LogUtil.d(UnderstandText);
-
-                    TextUnderstandResult textUnderstandResult = new TextUnderstandResult(UnderstandText);
-                    String ttsText = textUnderstandResult.getTtsText();
-                    LogUtil.d("====== ttsText: " + ttsText);
-                    if(ttsText != null && !ttsText.equals("")) {
-                        startTtsOutput(ttsText);
-                    }
-                }
-            } else {
-                LogUtil.d("understander result : null");
-            }
-            LogUtil.d("========================================================");
-        }
-
-        @Override
-        public void onError(SpeechError error) {
-            // 文本语义不能使用回调错误码14002，请确认您下载sdk时是否勾选语义场景和私有语义的发布
-            LogUtil.d("TextUnderstanderListener - onError Code："	+ error.getErrorCode());
-        }
-    };
-
-    private void initTextUnderstand() {
-        mTextUnderstander = TextUnderstander.createTextUnderstander(mContext, mTextUdrInitListener);
-    }
-
-    private void understandResult(RecognizerResult results) {
-        String text = JsonParser.parseIatResult(results.getResultString());
-
-        String sn = null;
-        // 读取json结果中的sn字段
-        try {
-            JSONObject resultJson = new JSONObject(results.getResultString());
-            sn = resultJson.optString("sn");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        mIatResults.put(sn, text);
-
-        StringBuffer resultBuffer = new StringBuffer();
-        for (String key : mIatResults.keySet()) {
-            resultBuffer.append(mIatResults.get(key));
-        }
-
-//		LogUtil.d("======== result: " + resultBuffer.toString());
-
-        int ret = mTextUnderstander.understandText(text, mTextUnderstanderListener);
-        if(ret != 0)
-        {
-            LogUtil.d("text understand error: " + ret);
-        }
-    }
-
-    /**
-     * ==================================================================================
-     *                               control led
-     * ==================================================================================
-     */
-    private Timer mTimer;
-    private boolean isShowLedGroupA = true;
-    private TimerTask mLedTimerTask;
-
-    public void showLedOnListener(boolean isShow) {
-        LogUtil.d("SmartEcho - showLedOnListener: " + isShow);
-        if (isShow) {
-            if (mTimer == null ) {
-                mTimer = new Timer();
-                mLedTimerTask = new TimerTask() {
-                    @Override
-                    public void run() {
-                        controlLedOnListerner();
-                    }
-                };
-                mTimer.schedule(mLedTimerTask, 500, 1000);
-            }
-        } else {
-            if (mTimer != null) {
-                mTimer.cancel();
-                mTimer = null;
-            }
-            if (mLedTimerTask != null) {
-                mLedTimerTask.cancel();
-                mLedTimerTask = null;
-            }
-            LedController.setAllLedOff();
-        }
-    }
-
-    public void controlLedOnListerner() {
-        if (isShowLedGroupA) {
-            LedController.setGroupLedState("A", 255);
-            LedController.setGroupLedState("B", 0);
-        } else {
-            LedController.setGroupLedState("A", 0);
-            LedController.setGroupLedState("B", 255);
-        }
-        isShowLedGroupA = !isShowLedGroupA;
-    }
 
 }
