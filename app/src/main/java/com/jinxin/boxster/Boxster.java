@@ -1,4 +1,4 @@
-package com.rockchip.echo.smartecho;
+package com.jinxin.boxster;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -16,10 +16,10 @@ import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechRecognizer;
 import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
+import com.jinxin.boxster.util.JsonParser;
+import com.jinxin.boxster.util.LogUtil;
 import com.rockchip.echo.R;
-import com.rockchip.echo.SmartEchoApp;
-import com.rockchip.echo.util.JsonParser;
-import com.rockchip.echo.util.LogUtil;
+import com.rockchip.echo.TVBoxSpeechRecognitionApp;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,10 +28,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
- * Created by yhc on 16-11-20.
+ * Created by wangfan on 18-3-20.
  */
 
-public class SmartEcho {
+public class Boxster {
 
     private Context mContext;
 
@@ -39,7 +39,7 @@ public class SmartEcho {
     boolean mIsOnTts = false;
     boolean mIsNeedStartIat = false;
 
-    public SmartEcho(Context context) {
+    public Boxster(Context context) {
         mContext = context;
         init();
     }
@@ -369,7 +369,7 @@ public class SmartEcho {
             LogUtil.d("====== skip result: " + resultStr);
             return;
         }
-        Toast.makeText(SmartEchoApp.getContext(),text,Toast.LENGTH_SHORT).show();
+        Toast.makeText(TVBoxSpeechRecognitionApp.getContext(),text,Toast.LENGTH_SHORT).show();
         Log.d("TAG", "printResult: "+text);
 
     }

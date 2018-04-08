@@ -1,4 +1,4 @@
-package com.rockchip.echo.util;
+package com.jinxin.boxster.util;
 
 import android.content.Intent;
 import android.os.Bundle;

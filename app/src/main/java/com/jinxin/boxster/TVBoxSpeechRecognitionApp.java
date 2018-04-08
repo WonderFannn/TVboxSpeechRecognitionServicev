@@ -6,13 +6,13 @@ import android.content.Context;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 
-public class SmartEchoApp extends Application {
+public class TVBoxSpeechRecognitionApp extends Application {
 	public static Context context;
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		context = getApplicationContext();
-		SpeechUtility.createUtility(SmartEchoApp.this,
+		SpeechUtility.createUtility(TVBoxSpeechRecognitionApp.this,
 				SpeechConstant.APPID + "=" + getString(R.string.app_id));
 	}
 

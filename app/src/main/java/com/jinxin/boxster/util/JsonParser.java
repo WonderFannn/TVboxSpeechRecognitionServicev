@@ -1,4 +1,4 @@
-package com.rockchip.echo.util;
+package com.jinxin.boxster.util;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
