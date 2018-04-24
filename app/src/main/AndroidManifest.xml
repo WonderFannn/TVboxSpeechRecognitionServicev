@@ -30,7 +30,7 @@
         android:theme="@style/AppTheme">
 
         <receiver
-            android:name=".SmartEchoReceiver"
+            android:name=".TVBoxSpeechRecognitionReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

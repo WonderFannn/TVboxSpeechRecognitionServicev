@@ -48,10 +48,12 @@ public class TVBoxSpeechRecognitionService extends Service {
             LogUtil.d("TVBoxSpeechRecognitionService - onStartCommand - " + action);
             if (SMART_ECHO_ACTION_START.equals(action)) {
                 if (!isEchoRunning) {
-                    mBoxster.startTtsOutput("灵犀灵犀来了", false);
+                    mBoxster.startTtsOutput("电视盒子语音服务启动了", false);
                 }
             } else if(SMART_ECHO_ACTION_WAKEUP.equals(action)) {
 //                mBoxster.onWakeUp(0, 0);
+                mBoxster.startIat();
+
             }
         }
         return START_STICKY;

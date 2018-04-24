@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SmartEcho</string>
+    <string name="app_name">Beone电视盒子语音服务</string>
     <!-- 请替换成在语音云官网申请的appid -->
-    <string name="app_id">580adc58</string>
+    <string name="app_id">5abb3d8e</string>
     <string formatted="false" name="tts_toast_format">buffer %d%%，playing %d%%</string>
 </resources>

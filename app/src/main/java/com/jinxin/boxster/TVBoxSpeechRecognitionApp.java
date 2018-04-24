@@ -1,4 +1,4 @@
-package com.rockchip.echo;
+package com.jinxin.boxster;
 
 import android.app.Application;
 import android.content.Context;

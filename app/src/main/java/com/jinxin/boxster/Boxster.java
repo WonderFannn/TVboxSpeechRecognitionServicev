@@ -18,8 +18,6 @@ import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
 import com.jinxin.boxster.util.JsonParser;
 import com.jinxin.boxster.util.LogUtil;
-import com.rockchip.echo.R;
-import com.rockchip.echo.TVBoxSpeechRecognitionApp;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -292,12 +290,13 @@ public class Boxster {
         }
     };
 
-    private void startIat() {
+    public void startIat() {
         LogUtil.d("SmartEcho - startIat");
         mStartRecognize = true;
         // start listening user
         if(mIat != null && !mIat.isListening()) {
             mIat.startListening(mIatListener);
+            Toast.makeText(TVBoxSpeechRecognitionApp.getContext(),"识别中",Toast.LENGTH_LONG).show();
         }
     }
 
